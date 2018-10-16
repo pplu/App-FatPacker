@@ -1,5 +1,8 @@
 Revision history for App-FatPacker
 
+0.010008 - ????-??-??
+  - Make fatpack work on Windows (RT #124048)
+
 0.010007 - 2017-01-22
   - don't fail packlist finding if one module fails to load
   - don't fail tracing w/undef INC values due to failed optional module load

@@ -32,6 +32,13 @@ sub lines_of {
   map +(chomp,$_)[1], do { local @ARGV = ($_[0]); <> };
 }
 
+sub slashify {
+  my $p = shift;
+  my $sep = shift || ($^O eq 'MSWin32' ? '\\' : '/');
+  $p =~ s#[/\\]+#$sep#g;
+  return $p;
+}
+
 sub stripspace {
   my ($text) = @_;
   $text =~ /^(\s+)/ && $text =~ s/^$1//mg;
@@ -135,6 +142,7 @@ sub trace {
 
 sub script_command_packlists_for {
   my ($self, $args) = @_;
+  chomp(@$args = <STDIN>) unless @$args;
   foreach my $pl ($self->packlists_containing($args)) {
     print "${pl}\n";
   }
@@ -160,15 +168,16 @@ sub packlists_containing {
     no_chdir => 1,
     wanted => sub {
       return unless /[\\\/]\.packlist$/ && -f $_;
-      $pack_rev{$_} = $File::Find::name for lines_of $File::Find::name;
+      $pack_rev{slashify($_)} = $File::Find::name for lines_of $File::Find::name;
     },
   }, @search);
-  my %found; @found{map +($pack_rev{Cwd::abs_path($INC{$_})}||()), @targets} = ();
+  my %found; @found{map +($pack_rev{slashify(Cwd::abs_path($INC{$_}))}||()), @targets} = ();
   sort keys %found;
 }
 
 sub script_command_tree {
   my ($self, $args) = @_;
+  chomp(@$args = <STDIN>) unless @$args;
   my $base = catdir(cwd,'fatlib');
   $self->packlists_to_tree($base, $args);
 }
@@ -187,6 +196,7 @@ sub packlists_to_tree {
         # if the last bit is a number it's $Config{archname}/$version/auto
         # so use $p-3 in that case
         my $version_lib = 0+!!($dir_parts[$p-1] =~ /^[0-9.]+$/);
+        $version_lib -= 1 if $^O eq 'MSWin32'; # Ugly for now - seems to work for Strawberry and ActivePerl
         $pack_base = catpath $vol, catdir @dir_parts[0..$p-(2+$version_lib)];
         last PART;
       }

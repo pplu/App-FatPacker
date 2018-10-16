@@ -1,0 +1,22 @@
+34a35,41
+> sub slashify {
+>   my $p = shift;
+>   my $sep = shift || ($^O eq 'MSWin32' ? '\\' : '/');
+>   $p =~ s#[/\\]+#$sep#g;
+>   return $p;
+> }
+> 
+137a145
+>   chomp(@$args = <STDIN>) unless @$args;
+163c171
+<       $pack_rev{$_} = $File::Find::name for lines_of $File::Find::name;
+---
+>       $pack_rev{slashify($_)} = $File::Find::name for lines_of $File::Find::name;
+166c174
+<   my %found; @found{map +($pack_rev{Cwd::abs_path($INC{$_})}||()), @targets} = ();
+---
+>   my %found; @found{map +($pack_rev{slashify(Cwd::abs_path($INC{$_}))}||()), @targets} = ();
+171a180
+>   chomp(@$args = <STDIN>) unless @$args;
+189a199
+>         $version_lib -= 1 if $^O eq 'MSWin32'; # Ugly for now - seems to work for Strawberry and ActivePerl
