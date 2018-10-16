@@ -1,5 +1,9 @@
 Revision history for App-FatPacker
 
+0.010008 - ????-??-??
+  - Let ExtUtils::MakeMaker change the shebang of fatpacker so that it points to the perl
+    that it was installed on (and not the first one in the PATH) RT #121701
+
 0.010007 - 2017-01-22
   - don't fail packlist finding if one module fails to load
   - don't fail tracing w/undef INC values due to failed optional module load
