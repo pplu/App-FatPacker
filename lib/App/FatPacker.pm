@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use 5.008001;
 use Getopt::Long;
-use Cwd qw(cwd);
+use Cwd qw(cwd abs_path);
 use File::Find qw(find);
 use File::Spec::Functions qw(
   catdir splitpath splitdir catpath rel2abs abs2rel
@@ -187,7 +187,7 @@ sub packlists_to_tree {
         # if the last bit is a number it's $Config{archname}/$version/auto
         # so use $p-3 in that case
         my $version_lib = 0+!!($dir_parts[$p-1] =~ /^[0-9.]+$/);
-        $pack_base = catpath $vol, catdir @dir_parts[0..$p-(2+$version_lib)];
+        $pack_base = abs_path(catpath $vol, catdir @dir_parts[0..$p-(2+$version_lib)]);
         last PART;
       }
     }
